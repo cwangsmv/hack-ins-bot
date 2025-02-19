@@ -32,8 +32,8 @@ jobs:
             build-targets: portable
           - os: ubuntu-22.04
             build-targets: tar.gz
-          - os: ubuntu-22.04-arm
-            build-targets: tar.gz
+          # - os: ubuntu-22.04-arm
+          #   build-targets: tar.gz
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4

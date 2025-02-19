@@ -50,9 +50,9 @@ jobs:
           - os: ubuntu-22.04
             csc_link_secret: ''
             csc_key_password_secret: ''
-          - os: ubuntu-22.04-arm
-            csc_link_secret: ''
-            csc_key_password_secret: ''
+          # - os: ubuntu-22.04-arm
+          #   csc_link_secret: ''
+          #   csc_key_password_secret: ''
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
