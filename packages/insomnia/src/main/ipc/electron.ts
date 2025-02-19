@@ -34,6 +34,7 @@ export type HandleChannels =
   | 'secretStorage.deleteSecret'
   | 'secretStorage.encryptString'
   | 'secretStorage.decryptString'
+  | 'cloudService.authenticate'
   | 'git.loadGitRepository'
   | 'git.getGitBranches'
   | 'git.gitFetchAction'

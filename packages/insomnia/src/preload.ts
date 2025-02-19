@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, webUtils as _webUtils } from 'electron';
 
 import type { GitServiceAPI } from './main/git-service';
+import type { cloudServiceBridgeAPI } from './main/ipc/cloud-service-integration/cloud-service';
 import type { gRPCBridgeAPI } from './main/ipc/grpc';
 import type { secretStorageBridgeAPI } from './main/ipc/secret-storage';
 import type { CurlBridgeAPI } from './main/network/curl';
@@ -83,6 +84,10 @@ const git: GitServiceAPI = {
   completeSignInToGitLab: options => ipcRenderer.invoke('git.completeSignInToGitLab', options),
 };
 
+const cloudService: cloudServiceBridgeAPI = {
+  authenticate: options => ipcRenderer.invoke('cloudService.authenticate', options),
+};
+
 const main: Window['main'] = {
   startExecution: options => ipcRenderer.send('startExecution', options),
   addExecutionStep: options => ipcRenderer.send('addExecutionStep', options),
@@ -112,6 +117,7 @@ const main: Window['main'] = {
   grpc,
   curl,
   secretStorage,
+  cloudService,
   trackSegmentEvent: options => ipcRenderer.send('trackSegmentEvent', options),
   trackPageView: options => ipcRenderer.send('trackPageView', options),
   showNunjucksContextMenu: options => ipcRenderer.send('show-nunjucks-context-menu', options),
