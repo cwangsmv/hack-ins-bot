@@ -43,7 +43,7 @@ export const loader: LoaderFunction = async (): Promise<RootLoaderData> => {
   const settings = await models.settings.get();
   const workspaceCount = await models.workspace.count();
   const userSession = await models.userSession.getOrCreate();
-  const cloudCredentials = await models.cloudCrendential.all();
+  const cloudCredentials = await models.cloudCredential.all();
 
   return {
     settings,

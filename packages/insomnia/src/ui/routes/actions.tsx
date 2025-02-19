@@ -1556,18 +1556,18 @@ export const createCloudCredentialAction: ActionFunction = async ({ request }) =
   if (name && provider && credentials) {
     if (isAuthenticated) {
       // find credential with same name for oauth authenticated cloud service
-      const existingCredential = await models.cloudCrendential.getByName(name, provider);
+      const existingCredential = await models.cloudCredential.getByName(name, provider);
       if (existingCredential.length === 0) {
-        await models.cloudCrendential.create(patch);
+        await models.cloudCredential.create(patch);
       } else {
-        await models.cloudCrendential.update(existingCredential[0], patch);
+        await models.cloudCredential.update(existingCredential[0], patch);
       }
       return credentials;
     } else {
       const authenciateResponse = await window.main.cloudService.authenticate({ provider, credentials });
       const { success, error, result } = authenciateResponse!;
       if (success) {
-        await models.cloudCrendential.create(patch);
+        await models.cloudCredential.create(patch);
       } else {
         return {
           error: error?.errorMessage,
@@ -1590,9 +1590,9 @@ export const updateCloudCredentialAction: ActionFunction = async ({ request, par
     const authenciateResponse = await window.main.cloudService.authenticate({ provider, credentials });
     const { success, error, result } = authenciateResponse!;
     if (success) {
-      const originCredential = await models.cloudCrendential.getById(cloudCredentialId);
+      const originCredential = await models.cloudCredential.getById(cloudCredentialId);
       invariant(originCredential, 'No Cloud Credential found');
-      await models.cloudCrendential.update(originCredential, patch);
+      await models.cloudCredential.update(originCredential, patch);
     } else {
       return {
         error: error?.errorMessage,
@@ -1606,8 +1606,8 @@ export const updateCloudCredentialAction: ActionFunction = async ({ request, par
 export const deleteCloudCredentialAction: ActionFunction = async ({ params }) => {
   const { cloudCredentialId } = params;
   invariant(typeof cloudCredentialId === 'string', 'Cloud Credential ID is required');
-  const cloudCredential = await models.cloudCrendential.getById(cloudCredentialId);
+  const cloudCredential = await models.cloudCredential.getById(cloudCredentialId);
   invariant(cloudCredential, 'Cloud Credential not found');
-  await models.cloudCrendential.remove(cloudCredential);
+  await models.cloudCredential.remove(cloudCredential);
   return null;
 };
