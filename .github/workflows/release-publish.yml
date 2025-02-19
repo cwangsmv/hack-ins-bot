@@ -308,3 +308,4 @@ jobs:
       registry-password:  ${{ secrets.DOCKER_REGISTRY_TOKEN }}
       provenance-registry-username: ${{ secrets.DOCKER_REGISTRY_USER }}
       provenance-registry-password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
