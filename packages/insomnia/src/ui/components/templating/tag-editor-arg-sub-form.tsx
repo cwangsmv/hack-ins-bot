@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { BaseModel } from '../../../models';
 import type { NunjucksParsedTag } from '../../../templating/utils';
+import { isValidJSONString } from '../../../utils/json';
 import { ExternalVaultForm } from './external-vault/external-vault-form';
 
 export interface ArgConfigFormProps {
@@ -14,14 +15,13 @@ export interface ArgConfigFormProps {
 const formTagNameMapping = {
   'vault': ExternalVaultForm,
 };
-const isValidJSONString = (input: string) => {
-  try {
-    const parsedJson = JSON.parse(input);
-    // Check if the parsed JSON is an object and not an array or null
-    return typeof parsedJson === 'object' && parsedJson !== null && !Array.isArray(parsedJson);
-  } catch (error) {
-    return false;
-  }
+const isValidJSONObjectString = (input: string) => {
+  if (isValidJSONString(input)) {
+    const parsedContent = JSON.parse(input);
+    // Check if the parsed JSON is an real object.
+    return typeof parsedContent === 'object' && parsedContent !== null && !Array.isArray(parsedContent);
+  };
+  return false;
 };
 export const couldRenderForm = (name: string) => name in formTagNameMapping;
 
@@ -30,7 +30,7 @@ export const ArgConfigSubForm = (props: ArgConfigFormProps) => {
   const tagName = activeTagDefinition.name as keyof typeof formTagNameMapping;
   const ConfigForm = formTagNameMapping[tagName];
 
-  if (ConfigForm && isValidJSONString(configValue)) {
+  if (ConfigForm && isValidJSONObjectString(configValue)) {
     return <ConfigForm {...props} />;
   }
   return configValue;

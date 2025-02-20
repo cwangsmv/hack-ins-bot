@@ -5,6 +5,7 @@ import { useFetcher } from 'react-router-dom';
 import { type BaseCloudCredential, type CloudProviderCredential, type CloudProviderName, getProviderDisplayName } from '../../../../models/cloud-credential';
 import { Icon } from '../../icon';
 import { AWSCredentialForm } from './aws-credential-form';
+import { GCPCredentialForm } from './gcp-credential-form';
 
 export interface CloudCredentialModalProps {
   provider: CloudProviderName;
@@ -81,6 +82,14 @@ export const CloudCredentialModal = (props: CloudCredentialModalProps) => {
               </div>
               {provider === 'aws' &&
                 <AWSCredentialForm
+                  data={providerCredential}
+                  isLoading={cloudCredentialFetcher.state !== 'idle'}
+                  onSubmit={handleFormSubmit}
+                  errorMessage={fetchErrorMessage}
+                />
+              }
+              {provider === 'gcp' &&
+                <GCPCredentialForm
                   data={providerCredential}
                   isLoading={cloudCredentialFetcher.state !== 'idle'}
                   onSubmit={handleFormSubmit}

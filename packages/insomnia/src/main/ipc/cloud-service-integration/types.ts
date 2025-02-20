@@ -22,4 +22,9 @@ export interface AWSSecretConfig {
   SecretKey?: string;
 };
 
-export type ExternalVaultConfig = AWSSecretConfig;
+export interface GCPSecretConfig {
+  secretName: string;
+  version?: string;
+}
+
+export type ExternalVaultConfig = AWSSecretConfig | GCPSecretConfig;

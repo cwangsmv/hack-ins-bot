@@ -1,5 +1,7 @@
 import type { AWSGetSecretConfig } from '../../../main/ipc/cloud-service-integration/aws-service';
 import type { CloudServiceSecretOption } from '../../../main/ipc/cloud-service-integration/cloud-service';
+import type { GCPGetSecretConfig } from '../../../main/ipc/cloud-service-integration/gcp-servcie';
+import type { GCPSecretConfig } from '../../../main/ipc/cloud-service-integration/types';
 import type { AWSSecretConfig, ExternalVaultConfig } from '../../../main/ipc/cloud-service-integration/types';
 import type { CloudProviderCredential, CloudProviderName } from '../../../models/cloud-credential';
 
@@ -7,6 +9,8 @@ export const getExternalVault = async (provider: CloudProviderName, providerCred
   switch (provider) {
     case 'aws':
       return getAWSSecret(secretConfig as AWSSecretConfig, providerCredential);
+    case 'gcp':
+      return getGCPSecret(secretConfig as GCPSecretConfig, providerCredential);
     default:
       return '';
   }
@@ -48,5 +52,25 @@ export const getAWSSecret = async (secretConfig: AWSSecretConfig, providerCreden
     }
   } else {
     throw new Error(`Get secret from AWS failed: ${error?.errorMessage}`);
+  }
+};
+
+export const getGCPSecret = async (secretConfig: GCPSecretConfig, providerCredential: CloudProviderCredential) => {
+  const { secretName, version } = secretConfig;
+  if (!secretName) {
+    throw new Error('Get secret from GCP failed: Secret Name is required');
+  }
+  const getSecretOption: CloudServiceSecretOption<GCPGetSecretConfig> = {
+    provider: 'gcp',
+    secretId: secretName,
+    credentials: providerCredential.credentials,
+    config: { version },
+  };
+  const secretResult = await window.main.cloudService.getSecret(getSecretOption);
+  const { success, error, result } = secretResult;
+  if (success && result) {
+    return result.value;
+  } else {
+    throw new Error(`Get secret from GCP failed: ${error?.errorMessage}`);
   }
 };

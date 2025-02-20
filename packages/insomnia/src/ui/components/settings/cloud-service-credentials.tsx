@@ -9,7 +9,9 @@ import { Icon } from '../icon';
 import { showModal } from '../modals';
 import { AskModal } from '../modals/ask-modal';
 import { CloudCredentialModal } from '../modals/cloud-credential-modal/cloud-credential-modal';
+import { SvgIcon } from '../svg-icon';
 import { UpgradeNotice } from '../upgrade-notice';
+import { NumberSetting } from './number-setting';
 
 interface createCredentialItemType {
   name: string;
@@ -21,6 +23,11 @@ const createCredentialItemList: createCredentialItemType[] = [
     id: 'aws',
     name: getProviderDisplayName('aws'),
     icon: <i className="ml-1 fa-brands fa-aws" />,
+  },
+  {
+    id: 'gcp',
+    name: getProviderDisplayName('gcp'),
+    icon: <SvgIcon icon='gcp-logo' className='ml-1' />,
   },
 ];
 const buttonClassName = 'disabled:opacity-50 h-7 aspect-square aria-pressed:bg-[--hl-sm] rounded-sm text-[--color-font] hover:bg-[--hl-xs] transition-all text-sm py-1 px-2';
@@ -137,12 +144,14 @@ export const CloudServiceCredentialList = () => {
                   </td>
                   <td className='w-52 whitespace-nowrap'>
                     <div className='flex gap-2'>
-                      <Button
-                        className={`${buttonClassName} w-16`}
-                        onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
-                      >
-                        <Icon icon="edit" />&nbsp;&nbsp;Edit
-                      </Button>
+                      {(provider === 'aws' || provider === 'gcp') &&
+                        <Button
+                          className={`${buttonClassName} w-16`}
+                          onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
+                        >
+                          <Icon icon="edit" />&nbsp;&nbsp;Edit
+                        </Button>
+                      }
                       <Button
                         className={`${buttonClassName} w-20`}
                         onPress={() => handleDeleteItem(_id, name)}
@@ -157,6 +166,24 @@ export const CloudServiceCredentialList = () => {
           </tbody>
         </table>
       }
+      <div>
+        <h2 className='font-bold pt-5 pb-2 text-lg bg-[--color-bg] z-10'>Cloud Secret Config</h2>
+        <div className="form-row items-end justify-between">
+          <NumberSetting
+            label="Secret Cache Duration(min)"
+            setting="vaultSecretCacheDuration"
+            help="Enter the amount of time in minutes external vault secrets are cached in Insomnia. Enter 0 to disable cache. Click the Reset Cache button to clear all cache."
+            min={0}
+            max={720}
+          />
+          <button
+            className="w-32 flex items-center gap-2 border border-solid border-[--hl-lg] px-[--padding-md] h-[--line-height-xs] rounded-[--radius-md] hover:bg-[--hl-xs] pointer mb-[--padding-sm] ml-[--padding-sm]"
+            onClick={() => window.main.cloudService.clearCache()}
+          >
+            Reset Cache
+          </button>
+        </div>
+      </div>
       {modalState && modalState.show &&
         <CloudCredentialModal
           provider={modalState.provider}
