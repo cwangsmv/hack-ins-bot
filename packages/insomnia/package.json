@@ -6,11 +6,11 @@
   "description": "The Collaborative API Design Tool",
   "homepage": "https://konghq.com",
   "bugs": {
-    "url": "https://github.com/Kong/insomnia/issues"
+    "url": "https://github.com/Kong/insomnia-ee/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kong/insomnia.git",
+    "url": "git+https://github.com/Kong/insomnia-ee.git",
     "directory": "packages/insomnia"
   },
   "license": "Apache-2.0",

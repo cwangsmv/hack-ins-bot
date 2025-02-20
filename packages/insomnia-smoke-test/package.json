@@ -5,11 +5,11 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kong/insomnia.git",
+    "url": "git+https://github.com/Kong/insomnia-ee.git",
     "directory": "packages/insomnia-smoke-test"
   },
   "bugs": {
-    "url": "https://github.com/kong/insomnia/issues"
+    "url": "https://github.com/kong/insomnia-ee/issues"
   },
   "version": "11.0.0-beta.0",
   "scripts": {
