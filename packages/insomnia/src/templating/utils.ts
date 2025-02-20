@@ -2,6 +2,7 @@ import type { EditorFromTextArea, MarkerRange } from 'codemirror';
 import _ from 'lodash';
 
 import type { RenderPurpose } from '../common/render';
+import type { BaseModel } from '../models';
 import { userSession } from '../models';
 import { decryptSecretValue, vaultEnvironmentMaskValue, vaultEnvironmentPath } from '../models/environment';
 import { decryptVaultKeyFromSession } from '../utils/vault';
@@ -19,6 +20,7 @@ export interface NunjucksParsedTagArg {
   displayName?: DisplayName;
   quotedBy?: '"' | "'";
   validate?: (value: any) => string;
+  modelFilter?: (model: BaseModel, tagArg: NunjucksParsedTagArg[]) => boolean;
   hide?: (arg0: NunjucksParsedTagArg[]) => boolean;
   model?: string;
   options?: PluginArgumentEnumOption[];

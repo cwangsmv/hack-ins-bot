@@ -1,9 +1,18 @@
+
+import * as models from '../../../models';
 import type { AWSTemporaryCredential, BaseCloudCredential, CloudProviderName } from '../../../models/cloud-credential';
-import { ipcMainHandle } from '../electron';
+import { ipcMainHandle, ipcMainOn } from '../electron';
 import { type AWSGetSecretConfig, AWSService } from './aws-service';
+import { type MaxAgeUnit, VaultCache } from './vault-cache';
+
+// in-memory cache for fetched vault secrets
+const vaultCache = new VaultCache();
 
 export interface cloudServiceBridgeAPI {
   authenticate: typeof cloudServiceProviderAuthentication;
+  getSecret: typeof getSecret;
+  clearCache: typeof clearVaultCache;
+  setCacheMaxAge: typeof setCacheMaxAge;
 }
 export interface CloudServiceAuthOption {
   provider: CloudProviderName;
@@ -17,6 +26,9 @@ export type CloudServiceGetSecretConfig = AWSGetSecretConfig;
 
 export function registerCloudServiceHandlers() {
   ipcMainHandle('cloudService.authenticate', (_event, options) => cloudServiceProviderAuthentication(options));
+  ipcMainHandle('cloudService.getSecret', (_event, options) => getSecret(options));
+  ipcMainOn('cloudService.clearCache', () => clearVaultCache());
+  ipcMainOn('cloudService.setCacheMaxAge', (_event, { maxAge, unit }) => setCacheMaxAge(maxAge, unit));
 }
 
 // factory pattern to create cloud service class based on its provider name
@@ -31,9 +43,35 @@ class ServiceFactory {
   }
 };
 
+const clearVaultCache = () => {
+  return vaultCache.clear();
+};
+
+const setCacheMaxAge = (newAge: number, unit: MaxAgeUnit = 'min') => {
+  return vaultCache.setMaxAge(newAge, unit);
+};
+
 // authenticate with cloud service provider
 const cloudServiceProviderAuthentication = (options: CloudServiceAuthOption) => {
   const { provider, credentials } = options;
   const cloudService = ServiceFactory.createCloudService(provider, credentials);
   return cloudService.authenticate();
+};
+
+const getSecret = async (options: CloudServiceSecretOption<CloudServiceGetSecretConfig>) => {
+  const { provider, credentials, secretId, config } = options;
+  const cloudService = ServiceFactory.createCloudService(provider, credentials);
+  const uniqueSecretKey = cloudService.getUniqueCacheKey(secretId, config);
+  if (vaultCache.has(uniqueSecretKey)) {
+    // return cache value if exists
+    return vaultCache.getItem(uniqueSecretKey);
+  }
+  const secretResult = await cloudService.getSecret(secretId, config);
+  if (secretResult.success) {
+    const settings = await models.settings.get();
+    const maxAge = Number(settings.vaultSecretCacheDuration) * 1000 * 60;
+    // set cached value after success
+    vaultCache.setItem(uniqueSecretKey, secretResult, { maxAge });
+  }
+  return secretResult;
 };

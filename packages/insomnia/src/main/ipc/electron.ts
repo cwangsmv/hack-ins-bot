@@ -35,6 +35,8 @@ export type HandleChannels =
   | 'secretStorage.encryptString'
   | 'secretStorage.decryptString'
   | 'cloudService.authenticate'
+  | 'cloudService.getSecret'
+  | 'cloudService.exchangeCode'
   | 'git.loadGitRepository'
   | 'git.getGitBranches'
   | 'git.gitFetchAction'
@@ -105,7 +107,10 @@ export type MainOnChannels =
   | 'addExecutionStep'
   | 'completeExecutionStep'
   | 'updateLatestStepName'
-  | 'startExecution';
+  | 'startExecution'
+  | 'cloudService.setCacheMaxAge'
+  | 'cloudService.clearCache'
+  | 'cloudService.openAuthUrl';
 
 export type RendererOnChannels =
   'clear-all-models'

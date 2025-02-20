@@ -7,15 +7,78 @@ import os from 'os';
 import { CookieJar } from 'tough-cookie';
 import * as uuid from 'uuid';
 
+import type { RenderPurpose } from '../../../common/render';
+import type { ExternalVaultConfig } from '../../../main/ipc/cloud-service-integration/types';
+import * as models from '../../../models';
+import type { CloudProviderCredential, CloudProviderName } from '../../../models/cloud-credential';
+import { vaultEnvironmentMaskValue } from '../../../models/environment';
 import type { Request, RequestParameter } from '../../../models/request';
 import type { Response } from '../../../models/response';
 import type { TemplateTag } from '../../../plugins';
 import type { PluginTemplateTag } from '../../../templating/extensions';
 import { invariant } from '../../../utils/invariant';
 import { buildQueryStringFromParams, joinUrlAndQueryString, smartEncodeUrl } from '../../../utils/url/querystring';
+import { getExternalVault } from './external-vault';
 import { fakerFunctions } from './faker-functions';
 
 const localTemplatePlugins: { templateTag: PluginTemplateTag }[] = [
+  {
+    templateTag: {
+      name: 'vault',
+      displayName: 'External Vault',
+      description: 'Link secret from external vault',
+      // external vault is an enterprise feature
+      needsEnterprisePlan: true,
+      args: [
+        {
+          displayName: 'Vault Service Provider',
+          type: 'enum',
+          options: [
+            { displayName: 'AWS Secrets Manager', value: 'aws' },
+          ],
+        },
+        {
+          displayName: 'Credential For Vault Service Provider',
+          type: 'model',
+          modelFilter: (credentialModel, args) => {
+            const providerNameFromArg = args[0].value;
+            const { provider } = credentialModel as CloudProviderCredential;
+            return providerNameFromArg === provider;
+          },
+          model: 'CloudCredential',
+        },
+        {
+          type: 'string',
+          defaultValue: '{}',
+          requireSubForm: true,
+        },
+      ],
+      async run(context, provider: CloudProviderName, credentialId: string, configStr: string) {
+        if (!provider) {
+          throw new Error('Get secret from external vault failed: Vault service provider is required');
+        }
+        if (!credentialId) {
+          throw new Error('Get secret from external vault failed: Credential is required');
+        };
+        const providerCredential = await models.cloudCredential.getById(credentialId);
+        if (!providerCredential) {
+          throw new Error('Get secret from external vault failed: No Cloud Credential found');
+        }
+        const renderContext = context.renderPurpose as RenderPurpose;
+        // Get secret from external vaults when send request or in tag-preview, otherwise return defautl mask value
+        if (renderContext === 'preview' || renderContext === 'send') {
+          let secretConfig = {};
+          try {
+            secretConfig = JSON.parse(configStr);
+          } catch (error) {
+            throw new Error('Get secret from external vault failed: Invalid vault secret config');
+          }
+          return getExternalVault(provider, providerCredential, secretConfig as ExternalVaultConfig);
+        }
+        return vaultEnvironmentMaskValue;
+      },
+    },
+  },
   {
     templateTag: {
       name: 'faker',

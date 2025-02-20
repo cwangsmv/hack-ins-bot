@@ -7,10 +7,10 @@ import { getKeys } from '../../../templating/utils';
 import type { RequestLoaderData } from '../../routes/request';
 import type { WorkspaceLoaderData } from '../../routes/workspace';
 let getRenderContextPromiseCache: any = {};
-
 export interface UseNunjucksOptions {
   renderContext: Pick<Partial<RenderContextOptions>, 'purpose' | 'extraInfo'>;
 }
+
 export const initializeNunjucksRenderPromiseCache = () => {
   getRenderContextPromiseCache = {};
 };
