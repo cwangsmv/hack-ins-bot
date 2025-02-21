@@ -11,6 +11,7 @@ import { database as db } from '../../common/database';
 import { importResourcesToWorkspace, scanResources, type ScanResult } from '../../common/import';
 import { generateId } from '../../common/misc';
 import * as models from '../../models';
+import type { BaseCloudCredential } from '../../models/cloud-credential';
 import { EnvironmentType } from '../../models/environment';
 import { getById, update } from '../../models/helpers/request-operations';
 import type { MockServer } from '../../models/mock-server';
@@ -1550,7 +1551,7 @@ export const toggleExpandAllRequestGroupsAction: ActionFunction = async ({ param
 
 export const createCloudCredentialAction: ActionFunction = async ({ request }) => {
   const patch = await request.json();
-  const { name, provider, credentials, isAuthenticated } = patch;
+  const { name, provider, credentials, isAuthenticated } = patch as BaseCloudCredential & { isAuthenticated?: boolean };
   invariant(typeof name === 'string', 'Name is required');
   invariant(provider, 'Cloud Provier name is required');
   if (name && provider && credentials) {
@@ -1567,6 +1568,12 @@ export const createCloudCredentialAction: ActionFunction = async ({ request }) =
       const authenciateResponse = await window.main.cloudService.authenticate({ provider, credentials });
       const { success, error, result } = authenciateResponse!;
       if (success) {
+        if (provider === 'hashicorp') {
+          // update access token and expires_at
+          const { access_token, expires_at } = result as { access_token: string; expires_at: number };
+          patch.credentials['access_token'] = access_token;
+          patch.credentials['expires_at'] = expires_at;
+        };
         await models.cloudCredential.create(patch);
       } else {
         return {
@@ -1592,6 +1599,12 @@ export const updateCloudCredentialAction: ActionFunction = async ({ request, par
     if (success) {
       const originCredential = await models.cloudCredential.getById(cloudCredentialId);
       invariant(originCredential, 'No Cloud Credential found');
+      if (provider === 'hashicorp') {
+        // update access token and expires_at
+        const { access_token, expires_at } = result as { access_token: string; expires_at: number };
+        patch.credentials['access_token'] = access_token;
+        patch.credentials['expires_at'] = expires_at;
+      };
       await models.cloudCredential.update(originCredential, patch);
     } else {
       return {

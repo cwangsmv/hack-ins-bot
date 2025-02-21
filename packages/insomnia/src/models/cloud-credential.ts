@@ -1,7 +1,7 @@
 import { database as db } from '../common/database';
 import type { BaseModel } from './index';
 
-export type CloudProviderName = 'aws' | 'azure' | 'gcp';
+export type CloudProviderName = 'aws' | 'azure' | 'gcp' | 'hashicorp';
 export enum AWSCredentialType {
   temp = 'temporary'
 }
@@ -17,22 +17,49 @@ export interface IBaseCloudCredential {
   provider: CloudProviderName;
 }
 export interface AWSCloudCredential extends IBaseCloudCredential {
-  name: string;
-  provider: 'aws';
-  credentials: AWSTemporaryCredential;
-}
-export type CloudeProviderCredentialType = AWSTemporaryCredential;
-export interface AWSCloudCredential extends IBaseCloudCredential {
-  name: string;
   provider: 'aws';
   credentials: AWSTemporaryCredential;
 }
 export interface GCPCloudCredential extends IBaseCloudCredential {
-  name: string;
   provider: 'gcp';
   credentials: string;
 }
-export type BaseCloudCredential = AWSCloudCredential | GCPCloudCredential;
+export interface HashiCorpBaseCredential {
+  access_token?: string;
+  expires_at?: number;
+}
+export enum HashiCorpCredentialType {
+  cloud = 'cloud',
+  onPrem = 'onPrem',
+};
+export enum HashiCorpVaultAuthMethod {
+  token = 'token',
+  appRole = 'appRole',
+}
+export interface HCPCredential extends HashiCorpBaseCredential {
+  client_id: string;
+  client_secret: string;
+  type: HashiCorpCredentialType.cloud;
+};
+export interface VaultAppRoleCredential extends HashiCorpBaseCredential {
+  role_id: string;
+  secret_id: string;
+  authMethod: HashiCorpVaultAuthMethod.appRole;
+  type: HashiCorpCredentialType.onPrem;
+  serverAddress: string;
+}
+export interface VaultTokenCredential extends HashiCorpBaseCredential {
+  authMethod: HashiCorpVaultAuthMethod.token;
+  access_token: string;
+  type: HashiCorpCredentialType.onPrem;
+  serverAddress: string;
+}
+export type HashiCorpCredentials = HCPCredential | VaultAppRoleCredential | VaultTokenCredential;
+export interface HashiCorpCredential extends IBaseCloudCredential {
+  provider: 'hashicorp';
+  credentials: HashiCorpCredentials;
+}
+export type BaseCloudCredential = AWSCloudCredential | GCPCloudCredential | HashiCorpCredential;
 export type CloudProviderCredential = BaseModel & BaseCloudCredential;
 
 export const name = 'Cloud Credential';
@@ -50,6 +77,7 @@ export function getProviderDisplayName(provider: CloudProviderName) {
     aws: 'AWS',
     azure: 'Azure',
     gcp: 'GCP',
+    hashicorp: 'HashiCorp',
   }[provider] || '';
 };
 

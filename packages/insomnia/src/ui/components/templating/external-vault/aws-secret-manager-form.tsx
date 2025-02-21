@@ -44,7 +44,7 @@ export const AWSSecretManagerForm = (props: AWSSecretManagerFormProps) => {
     onChange(newConfig as unknown as AWSSecretConfig);
   };
   return (
-    <form id='aws-secret-manager-form'>
+    <>
       <div className="form-row">
         <div className="form-control">
           <label>
@@ -114,7 +114,7 @@ export const AWSSecretManagerForm = (props: AWSSecretManagerFormProps) => {
             <label>
               Secret Key
               <HelpTooltip className="space-left">
-                The Secret Key of the retrived key/value secrets.
+                The secret key of the retrived key-value secrets.
               </HelpTooltip>
               <input
                 name='SecretKey'
@@ -125,6 +125,6 @@ export const AWSSecretManagerForm = (props: AWSSecretManagerFormProps) => {
           </div>
         </div>
       }
-    </form>
+    </>
   );
 };

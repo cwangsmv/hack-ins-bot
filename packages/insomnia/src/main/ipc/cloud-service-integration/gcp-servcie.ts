@@ -10,7 +10,7 @@ import type { CloudServiceResult, GCPSecretConfig, ICloudService } from './types
 export const providerName: CloudProviderName = 'gcp';
 export type GCPGetSecretConfig = Omit<GCPSecretConfig, 'secretName'>;
 export class GCPService implements ICloudService {
-  _keyPath: string;
+  private _keyPath: string;
 
   constructor(keyPath: string) {
     this._keyPath = keyPath;

@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button } from 'react-aria-components';
 
 import { debounce } from '../../../../common/misc';
-import type { AWSSecretConfig, ExternalVaultConfig, GCPSecretConfig } from '../../../../main/ipc/cloud-service-integration/types';
+import type { AWSSecretConfig, ExternalVaultConfig, GCPSecretConfig, HashiCorpSecretConfig } from '../../../../main/ipc/cloud-service-integration/types';
 import { type CloudProviderCredential, type CloudProviderName, type } from '../../../../models/cloud-credential';
 import { Icon } from '../../icon';
 import { CloudCredentialModal } from '../../modals/cloud-credential-modal/cloud-credential-modal';
 import type { ArgConfigFormProps } from '../tag-editor-arg-sub-form';
 import { AWSSecretManagerForm } from './aws-secret-manager-form';
 import { GCPSecretManagerForm } from './gcp-secret-manager-form';
+import { HashiCorpVaultForm } from './hashicorp-vault-form';
 
 export const ExternalVaultForm = (props: ArgConfigFormProps) => {
   const { onChange, configValue, activeTagData, docs } = props;
   const [showModal, setShowModal] = useState(false);
   const provider = activeTagData.args[0].value as CloudProviderName;
-  const formData = JSON.parse(configValue) as ExternalVaultConfig;
+  const formData = useMemo(() => {
+    return JSON.parse(configValue) as ExternalVaultConfig;
+  }, [configValue]);
   const selectedCredentialId = activeTagData.args[1].value;
   const cloudCredentialDocs = docs[type] as CloudProviderCredential[] || [];
   const selectedCredentialDoc = cloudCredentialDocs.find(d => d._id === selectedCredentialId);
@@ -22,7 +25,7 @@ export const ExternalVaultForm = (props: ArgConfigFormProps) => {
   const handleFormChange = debounce((newConfig: ExternalVaultConfig) => {
     const newFormValue = JSON.stringify(newConfig);
     onChange(newFormValue);
-  }, 1000);
+  }, 500);
   let SubForm;
 
   switch (provider) {
@@ -39,6 +42,15 @@ export const ExternalVaultForm = (props: ArgConfigFormProps) => {
       SubForm = (
         <GCPSecretManagerForm
           formData={formData as GCPSecretConfig}
+          onChange={handleFormChange}
+          activeTagData={activeTagData}
+        />
+      );
+      break;
+    case 'hashicorp':
+      SubForm = (
+        <HashiCorpVaultForm
+          formData={formData as HashiCorpSecretConfig}
           onChange={handleFormChange}
           activeTagData={activeTagData}
         />

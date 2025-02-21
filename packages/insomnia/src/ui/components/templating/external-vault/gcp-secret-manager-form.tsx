@@ -25,7 +25,7 @@ export const GCPSecretManagerForm = (props: GCPSecretManagerFormProps) => {
 
   };
   return (
-    <form id='gcp-secret-manager-form'>
+    <>
       <div className="form-row">
         <div className="form-control">
           <label>
@@ -53,6 +53,6 @@ export const GCPSecretManagerForm = (props: GCPSecretManagerFormProps) => {
           </label>
         </div>
       </div>
-    </form>
+    </>
   );
 };

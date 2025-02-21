@@ -29,6 +29,11 @@ const createCredentialItemList: createCredentialItemType[] = [
     name: getProviderDisplayName('gcp'),
     icon: <SvgIcon icon='gcp-logo' className='ml-1' />,
   },
+  {
+    id: 'hashicorp',
+    name: getProviderDisplayName('hashicorp'),
+    icon: <SvgIcon icon='hashicorp' className='ml-1' />,
+  },
 ];
 const buttonClassName = 'disabled:opacity-50 h-7 aspect-square aria-pressed:bg-[--hl-sm] rounded-sm text-[--color-font] hover:bg-[--hl-xs] transition-all text-sm py-1 px-2';
 
@@ -152,6 +157,12 @@ export const CloudServiceCredentialList = () => {
                           <Icon icon="edit" />&nbsp;&nbsp;Edit
                         </Button>
                       }
+                      <Button
+                        className={`${buttonClassName} w-16`}
+                        onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
+                      >
+                        <Icon icon="edit" />&nbsp;&nbsp;Edit
+                      </Button>
                       <Button
                         className={`${buttonClassName} w-20`}
                         onPress={() => handleDeleteItem(_id, name)}
