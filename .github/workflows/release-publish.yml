@@ -266,45 +266,47 @@ jobs:
         env:
           RELEASE_GH_TOKEN: ${{ secrets.RELEASE_GH_TOKEN }}
 
-  artifact-provenance:
-    needs: [publish]
-    permissions:
-      id-token: write # needed for signing the images
-      actions: read # For getting workflow run info to build provenance
-      packages: write # Required for publishing provenance. Issue: https://github.com/slsa-framework/slsa-github-generator/tree/main/internal/builders/container#known-issues
-      contents: write
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - product: insomnia
-            binary_artifacts_subject_as_file: ${{ needs.publish.outputs.ELECTRON_BINARY_ARTIFACTS_SUBJECTS_AS_FILE }}
-          - product: inso
-            binary_artifacts_subject_as_file: ${{ needs.publish.outputs.INSO_BINARY_ARTIFACTS_SUBJECTS_AS_FILE }}
-    # need to use non hash version because of: https://github.com/slsa-framework/slsa-github-generator/issues/3498
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
-    with:
-      base64-subjects-as-file: "${{ matrix.binary_artifacts_subject_as_file }}"
-      upload-assets: true
-      upload-tag-name: ${{ needs.publish.outputs.INSOMNIA_RELEASE_TAG }}
-      provenance-name: ${{ matrix.product }}-provenance.intoto.jsonl
-      draft-release: false
+  # artifact-provenance:
+  #   needs: [publish]
+  #   permissions:
+  #     id-token: write # needed for signing the images
+  #     actions: read # For getting workflow run info to build provenance
+  #     packages: write # Required for publishing provenance. Issue: https://github.com/slsa-framework/slsa-github-generator/tree/main/internal/builders/container#known-issues
+  #     contents: write
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       include:
+  #         - product: insomnia
+  #           binary_artifacts_subject_as_file: ${{ needs.publish.outputs.ELECTRON_BINARY_ARTIFACTS_SUBJECTS_AS_FILE }}
+  #         - product: inso
+  #           binary_artifacts_subject_as_file: ${{ needs.publish.outputs.INSO_BINARY_ARTIFACTS_SUBJECTS_AS_FILE }}
+  #   # need to use non hash version because of: https://github.com/slsa-framework/slsa-github-generator/issues/3498
+  #   uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+  #   with:
+  #     base64-subjects-as-file: "${{ matrix.binary_artifacts_subject_as_file }}"
+  #     upload-assets: true
+  #     upload-tag-name: ${{ needs.publish.outputs.INSOMNIA_RELEASE_TAG }}
+  #     provenance-name: ${{ matrix.product }}-provenance.intoto.jsonl
+  #     draft-release: false
+  #     # private-repository: true
 
-  inso-image-provenance:
-    needs: [publish]
-    permissions:
-      id-token: write # needed for signing the images
-      actions: read # For getting workflow run info to build provenance
-      packages: write # Required for publishing provenance. Issue: https://github.com/slsa-framework/slsa-github-generator/tree/main/internal/builders/container#known-issues
-    # need to use non hash version because of: https://github.com/slsa-framework/slsa-github-generator/issues/3498
-      contents: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
-    with:
-      image: ${{ needs.publish.outputs.INSO_DOCKER_IMAGE }}
-      digest: ${{ needs.publish.outputs.INSO_DOCKER_IMAGE_DIGEST }}
-      provenance-repository: "${{ needs.publish.outputs.NOTARY_REPOSITORY }}"
-    secrets:
-      registry-username: ${{ secrets.DOCKER_REGISTRY_USER }}
-      registry-password:  ${{ secrets.DOCKER_REGISTRY_TOKEN }}
-      provenance-registry-username: ${{ secrets.DOCKER_REGISTRY_USER }}
-      provenance-registry-password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+  # inso-image-provenance:
+  #   needs: [publish]
+  #   permissions:
+  #     id-token: write # needed for signing the images
+  #     actions: read # For getting workflow run info to build provenance
+  #     packages: write # Required for publishing provenance. Issue: https://github.com/slsa-framework/slsa-github-generator/tree/main/internal/builders/container#known-issues
+  #   # need to use non hash version because of: https://github.com/slsa-framework/slsa-github-generator/issues/3498
+  #     contents: write
+  #   uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.0.0
+  #   with:
+  #     image: ${{ needs.publish.outputs.INSO_DOCKER_IMAGE }}
+  #     digest: ${{ needs.publish.outputs.INSO_DOCKER_IMAGE_DIGEST }}
+  #     provenance-repository: "${{ needs.publish.outputs.NOTARY_REPOSITORY }}"
+  #     # private-repository: true
+  #   secrets:
+  #     registry-username: ${{ secrets.DOCKER_REGISTRY_USER }}
+  #     registry-password:  ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+  #     provenance-registry-username: ${{ secrets.DOCKER_REGISTRY_USER }}
+  #     provenance-registry-password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
