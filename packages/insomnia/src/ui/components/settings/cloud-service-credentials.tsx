@@ -121,7 +121,7 @@ export const CloudServiceCredentialList = () => {
         </MenuTrigger>
       </div>
       {cloudCredentials.length === 0 ?
-        <div className="text-center faint italic pad">No cloud servicie provider credentials found</div> :
+        <div className="text-center faint italic pad">No cloud service provider credentials found</div> :
         <table className="table--fancy table--striped table--valign-middle margin-top margin-bottom">
           <thead>
             <tr>
@@ -149,14 +149,6 @@ export const CloudServiceCredentialList = () => {
                   </td>
                   <td className='w-52 whitespace-nowrap'>
                     <div className='flex gap-2'>
-                      {(provider === 'aws' || provider === 'gcp') &&
-                        <Button
-                          className={`${buttonClassName} w-16`}
-                          onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
-                        >
-                          <Icon icon="edit" />&nbsp;&nbsp;Edit
-                        </Button>
-                      }
                       <Button
                         className={`${buttonClassName} w-16`}
                         onPress={() => setModalState({ show: true, provider: provider!, credential: cloudCred })}
