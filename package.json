@@ -43,6 +43,7 @@
   "devDependencies": {
     "@types/chai": "^4.3.14",
     "@types/eslint": "^8.56.7",
+    "deep-chat-react": "^2.1.1",
     "@types/har-format": "^1.2.15",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.12.4",
