@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom';
 import { useFetcher, useNavigate, useParams } from 'react-router-dom';
 
 import { getInsomniaHackathonAPIKey } from '../../common/constants';
-import * as models from '../../models';
 
 export const InsomniaBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +37,7 @@ export const InsomniaBot = () => {
       const res = await fetch('https://hackathonchina2025.services.ai.azure.com/models/chat/completions', {
         method: 'POST',
         headers: {
-          'api-key': '',
+          'api-key': getInsomniaHackathonAPIKey() || '',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
