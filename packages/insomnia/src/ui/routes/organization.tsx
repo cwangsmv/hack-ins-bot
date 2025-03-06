@@ -50,6 +50,7 @@ import { HeaderUserButton } from '../components/header-user-button';
 import { Hotkey } from '../components/hotkey';
 import { Icon } from '../components/icon';
 import { InsomniaAI } from '../components/insomnia-ai-icon';
+import { InsomniaBot } from '../components/Insomnia-bot';
 import { InsomniaLogo } from '../components/insomnia-icon';
 import { showAlert, showModal } from '../components/modals';
 import { SettingsModal, showSettingsModal } from '../components/modals/settings-modal';
@@ -1004,6 +1005,7 @@ const OrganizationRoute = () => {
                       )}
                     </ProgressBar>
                   )}
+                    <InsomniaBot />
                   {!isMinimal && <NetworkAndSyncIndicator user={user} asyncTaskStatus={asyncTaskStatus} settings={settings} sync={syncOrgsAndProjects} />}
                   {!isMinimal && (
                     <Link>
