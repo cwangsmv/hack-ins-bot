@@ -1,8 +1,5 @@
-import { DeepChat } from 'deep-chat-react';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-
-import { getInsomniaHackathonAPIKey } from '../../common/constants';
 
 export const InsomniaBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -105,7 +102,7 @@ export const InsomniaBot = () => {
           </svg>
         </button>
       </div>
-      <div className="content flex flex-grow flex-col space-y-4 overflow-y-scroll">
+      <div className="content flex flex-col space-y-4 overflow-y-scroll">
         <div className="flex flex-col space-y-2">
           {chatHistory.map((chat, index) => (
             <div key={index} className="mb-2">
@@ -186,7 +183,7 @@ export const InsomniaBot = () => {
       >
         InsomniaBot
       </button>
-      {isOpen && ReactDOM.createPortal(reactBotPortal, document.body)}
+      {isOpen && ReactDOM.createPortal(dialog, document.body)}
     </div>
   );
 };
