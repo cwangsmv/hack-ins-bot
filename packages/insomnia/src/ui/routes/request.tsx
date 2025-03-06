@@ -148,8 +148,9 @@ export const createRequestAction: ActionFunction = async ({ request, params }) =
   if (requestType === 'HTTP') {
     activeRequestId = (await models.request.create({
       parentId: parentId || workspaceId,
-      method: METHOD_GET,
-      name: 'New Request',
+      method: req?.method || METHOD_GET,
+      name: req?.name || 'New Request',
+      url: req?.url || '',
       headers: defaultHeaders,
     }))._id;
   }
