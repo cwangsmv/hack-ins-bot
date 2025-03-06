@@ -1,5 +1,5 @@
 import { DeepChat } from 'deep-chat-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useFetcher, useNavigate, useParams } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
@@ -12,7 +12,7 @@ export const InsomniaBot = () => {
   const [response, setResponse] = useState('');
   const redirect = useNavigate();
   const fetcher = useFetcher();
-  const [chatHistory, setChatHistory] = useLocalStorage([]);
+  const [chatHistory, setChatHistory] = useLocalStorage('chat-history', []);
   const { projectId, workspaceId, organizationId } = useParams();
 
   useEffect(() => {
@@ -180,10 +180,10 @@ export const InsomniaBot = () => {
           return details;
         }}
         responseInterceptor={(response: any) => {
-          const newHistory = [...chatHistory, { text: response.choices[0].message.content, role: 'assistant' }];
-          setChatHistory(newHistory);
           // create a insomnia request using api and navigator to the tab
           if (response.choices[0].message.content === '__insomnia__create__reqeust__command__') {
+            const newHistory = [...chatHistory, { text: 'I have created a new request for you in Insomnia and navigated to the tab. Please check it out.', role: 'assistant' }];
+            setChatHistory(newHistory);
             const newRequestAction = () => {
               fetcher.submit(
                 JSON.stringify({ requestType: 'HTTP', parentId: workspaceId }),
@@ -199,6 +199,8 @@ export const InsomniaBot = () => {
               text: 'I have created a new request for you in Insomnia and navigated to the tab. Please check it out.',
             };
           }
+          const newHistory = [...chatHistory, { text: response.choices[0].message.content, role: 'assistant' }];
+          setChatHistory(newHistory);
           return {
             text: response.choices[0].message.content || '',
           };
