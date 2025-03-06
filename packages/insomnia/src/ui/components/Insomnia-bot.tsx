@@ -1,14 +1,19 @@
 import { DeepChat } from 'deep-chat-react';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useFetcher, useNavigate, useParams } from 'react-router-dom';
 
 import { getInsomniaHackathonAPIKey } from '../../common/constants';
+import * as models from '../../models';
 
 export const InsomniaBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [response, setResponse] = useState('');
+  const redirect = useNavigate();
+  const fetcher = useFetcher();
   const [chatHistory, setChatHistory] = useState([]);
+  const { projectId, workspaceId, organizationId } = useParams();
 
   useEffect(() => {
     const storedHistory = localStorage.getItem('chatHistory');
@@ -172,6 +177,31 @@ export const InsomniaBot = () => {
           return details;
         }}
         responseInterceptor={(response: any) => {
+          // create a insomnia request using api and navigator to the tab
+          if (response.choices[0].message.content === '__insomnia__create__reqeust__command__') {
+            const newRequestAction = async () => {
+              // const activeRequestId = (await models.request.create({
+              //   parentId: workspaceId,
+              //   method: 'GET',
+              //   name: 'New Request',
+              //   headers: [],
+              // }))._id;
+              // console.log(activeRequestId);
+              fetcher.submit(
+                JSON.stringify({ requestType: 'HTTP', parentId: workspaceId }),
+                {
+                  action: `/organization/${organizationId}/project/${projectId}/workspace/${workspaceId}/debug/request/new`,
+                  method: 'post',
+                  encType: 'application/json',
+                },
+              );
+              // redirect(`/organization/${organizationId}/project/${projectId}/workspace/${workspaceId}/debug/request/${activeRequestId}`);
+            };
+            setTimeout(newRequestAction, 1000);
+            return {
+              text: 'I have created a new request for you in Insomnia and navigated to the tab. Please check it out.',
+            };
+          }
           return {
             text: response.choices[0].message.content || '',
           };
