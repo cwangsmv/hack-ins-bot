@@ -38,7 +38,7 @@ export const InsomniaBot = () => {
       const res = await fetch('https://hackathonchina2025.services.ai.azure.com/models/chat/completions', {
         method: 'POST',
         headers: {
-          'api-key': '5VoC5nUaLiGuVpVmHuoBcoLGyQ6ezgsbyqRqXtSqw3yPDKkk7R7OJQQJ99BCACi0881XJ3w3AAAAACOGKfkY',
+          'api-key': '',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -179,14 +179,7 @@ export const InsomniaBot = () => {
         responseInterceptor={(response: any) => {
           // create a insomnia request using api and navigator to the tab
           if (response.choices[0].message.content === '__insomnia__create__reqeust__command__') {
-            const newRequestAction = async () => {
-              // const activeRequestId = (await models.request.create({
-              //   parentId: workspaceId,
-              //   method: 'GET',
-              //   name: 'New Request',
-              //   headers: [],
-              // }))._id;
-              // console.log(activeRequestId);
+            const newRequestAction = () => {
               fetcher.submit(
                 JSON.stringify({ requestType: 'HTTP', parentId: workspaceId }),
                 {
@@ -195,7 +188,6 @@ export const InsomniaBot = () => {
                   encType: 'application/json',
                 },
               );
-              // redirect(`/organization/${organizationId}/project/${projectId}/workspace/${workspaceId}/debug/request/${activeRequestId}`);
             };
             setTimeout(newRequestAction, 1000);
             return {
