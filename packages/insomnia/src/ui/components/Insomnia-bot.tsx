@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { useFetcher, useParams, useRouteLoaderData } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 
-import { getInsomniaHackathonAPIKey } from '../../common/constants';
+import { CONTENT_TYPE_JSON, getInsomniaHackathonAPIKey } from '../../common/constants';
 import { type Request, type as requestType } from '../../models/request';
 import type { WorkspaceLoaderData } from '../routes/workspace';
 import { InsomniaAI as AIIcon } from './insomnia-ai-icon';
@@ -21,8 +21,8 @@ export const InsomniaBot = () => {
   const [chatHistory, setChatHistory] = useLocalStorage<any[]>('chat-history', []);
   const { projectId, workspaceId, organizationId } = useParams();
   const [showLoadingBubble, setShowLoadingBubble] = useState(false);
-  const { collection } = useRouteLoaderData(':workspaceId') as WorkspaceLoaderData;
-  const requestDataToAI = collection.filter(c => c.doc.type === requestType).map(c => {
+  const { collection } = useRouteLoaderData(':workspaceId') as WorkspaceLoaderData || {};
+  const requestDataToAI = collection?.filter(c => c.doc.type === requestType).map(c => {
     const requestDoc = c.doc as Request;
     return {
       method: requestDoc.method,
@@ -31,7 +31,7 @@ export const InsomniaBot = () => {
       body: requestDoc.body,
       name: requestDoc.name,
     };
-  });
+  }) || [];
 
   useEffect(() => {
     const storedHistory = localStorage.getItem('chat-history');
@@ -287,7 +287,17 @@ export const InsomniaBot = () => {
                 name: parsedObj.name,
                 method: parsedObj.method,
                 url: parsedObj.url,
-                body: parsedObj.body,
+                ...(parsedObj.method.toLowerCase() === 'post' && {
+                  body: {
+                    mimeType: CONTENT_TYPE_JSON,
+                    text: JSON.stringify(parsedObj.body),
+                  },
+                }),
+                ...(parsedObj.method.toLowerCase() === 'post' && {
+                  headers: [{
+                    name: 'Content-Type', value: 'application/json',
+                  }],
+                }),
               };
             } catch (error) {
               console.error('Error parsing JSON:', error);

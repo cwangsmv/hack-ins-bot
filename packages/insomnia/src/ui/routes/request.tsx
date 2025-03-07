@@ -151,7 +151,8 @@ export const createRequestAction: ActionFunction = async ({ request, params }) =
       method: req?.method || METHOD_GET,
       name: req?.name || 'New Request',
       url: req?.url || '',
-      headers: defaultHeaders,
+      body: req?.body || {},
+      headers: [...defaultHeaders, ...req?.headers || []],
     }))._id;
   }
   if (requestType === 'gRPC') {
