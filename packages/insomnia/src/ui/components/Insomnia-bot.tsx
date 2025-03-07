@@ -1,8 +1,7 @@
 import { DeepChat } from 'deep-chat-react';
-import { shell } from 'electron';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { useFetcher, useNavigate, useParams, useRouteLoaderData } from 'react-router-dom';
+import { useFetcher, useParams, useRouteLoaderData } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 
 import { getInsomniaHackathonAPIKey } from '../../common/constants';
@@ -18,7 +17,6 @@ export const InsomniaBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [response, setResponse] = useState('');
-  const redirect = useNavigate();
   const fetcher = useFetcher();
   const [chatHistory, setChatHistory] = useLocalStorage<any[]>('chat-history', []);
   const { projectId, workspaceId, organizationId } = useParams();
@@ -42,11 +40,16 @@ export const InsomniaBot = () => {
     }
   }, []);
 
-  const handleOpen = () => {
-    setIsOpen(open => !open);
-  };
-
   const clearChatHistory = () => setChatHistory([]);
+
+  const handleOpen = () => {
+    setIsOpen(isOpen => {
+      if (isOpen) {
+        clearChatHistory();
+      }
+      return !isOpen;
+    });
+  };
 
   const handleClose = () => {
     setIsOpen(false);
